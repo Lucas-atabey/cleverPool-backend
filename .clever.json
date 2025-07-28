@@ -1,0 +1,12 @@
+{
+  "apps": [
+    {
+      "app_id": "app_047b6a05-471e-47d8-af11-99bab5d43080",
+      "org_id": "orga_a1768e1c-5ce1-4e58-b899-48aa67ff0d82",
+      "deploy_url": "https://push-n3-par-clevercloud-customers.services.clever-cloud.com/app_047b6a05-471e-47d8-af11-99bab5d43080.git",
+      "git_ssh_url": "git+ssh://git@push-n3-par-clevercloud-customers.services.clever-cloud.com/app_047b6a05-471e-47d8-af11-99bab5d43080.git",
+      "name": "cleverPoll-backend",
+      "alias": "cleverpoll-backend"
+    }
+  ]
+}

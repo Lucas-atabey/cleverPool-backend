@@ -1,0 +1,10 @@
+Flask==2.3.3
+flask-sqlalchemy==3.1.1
+flask-migrate==4.0.5
+flask-cors==4.0.0
+gunicorn==21.2.0
+redis==5.0.3
+python-dotenv==1.0.1
+psycopg2-binary
+PyJWT==2.8.0
+bcrypt==4.1.2

@@ -1,0 +1,6 @@
+[
+  { "name": "CC_PYTHON_MODULE", "value": "run:app" },
+  { "name": "CC_PYTHON_VERSION", "value": "3" },
+  { "name": "FRONTEND_ORIGIN", "value": "https://app-43185a78-847c-46bd-be3a-78b2b682783b.cleverapps.io" },
+  { "name": "CC_POST_BUILD_HOOK", "value": "clevercloud/post-build" }
+]

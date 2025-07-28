@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+echo "Running migrations..."
+export FLASK_APP=run.py      # ou ton fichier d'entrée
+export FLASK_ENV=production  # optionnel
+flask db upgrade
