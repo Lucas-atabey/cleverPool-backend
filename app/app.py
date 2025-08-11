@@ -19,7 +19,6 @@ def create_admin_if_not_exists():
     try:
         admin = Admin.query.filter_by(username=username).first()
     except (OperationalError, ProgrammingError) as e:
-        # La table n'existe probablement pas encore
         print("⚠️ Table 'admin' non trouvée, admin non créé pour l'instant. Faites la migration d'abord.")
         return
 
@@ -46,7 +45,9 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
 
+    print(f"Frontend origin1: {os.getenv("FRONTEND_ORIGIN", "*")}")
     frontend_origin = os.getenv("FRONTEND_ORIGIN", "*")
+    print(f"Frontend origi2: {frontend_origin}")
     CORS(app, origins=[frontend_origin])
 
     with app.app_context():

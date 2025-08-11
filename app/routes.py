@@ -202,3 +202,79 @@ def get_results(question_id):
         "question_text": question.text,
         "results": results,
     })
+
+@bp.route('/polls/full/<int:poll_id>', methods=['PUT'])
+@admin_required
+def update_full_poll(poll_id):
+    data = request.get_json()
+    title = data.get('title')
+    description = data.get('description')
+    questions_data = data.get('questions', [])
+
+    poll = Poll.query.get_or_404(poll_id)
+
+    # Mise à jour titre / description
+    if title:
+        poll.title = title
+    if description is not None:
+        poll.description = description
+
+    # On garde une trace des questions existantes
+    existing_questions = {q.id: q for q in poll.questions}
+
+    for q_data in questions_data:
+        q_id = q_data.get('id')
+        q_text = q_data.get('text')
+        q_options = q_data.get('options', [])
+
+        if q_id and q_id in existing_questions:
+            # Modification question existante
+            question = existing_questions[q_id]
+            if q_text:
+                question.text = q_text
+
+            # Gestion des options
+            existing_options = {o.id: o for o in question.options}
+            for opt_data in q_options:
+                if isinstance(opt_data, dict):
+                    opt_id = opt_data.get('id')
+                    opt_text = opt_data.get('text')
+                else:
+                    # compatibilité avec format simple ["option1", "option2"]
+                    opt_id = None
+                    opt_text = opt_data
+
+                if opt_id and opt_id in existing_options:
+                    if opt_text:
+                        existing_options[opt_id].text = opt_text
+                else:
+                    # Nouvelle option
+                    db.session.add(Option(text=opt_text, question_id=question.id))
+
+            # Suppression options non envoyées
+            sent_option_ids = {
+                o.get('id') for o in q_options if isinstance(o, dict) and o.get('id')
+            }
+            for opt in list(question.options):
+                if opt.id not in sent_option_ids:
+                    db.session.delete(opt)
+
+        else:
+            # Nouvelle question
+            question = Question(text=q_text, poll_id=poll.id)
+            db.session.add(question)
+            db.session.flush()
+
+            for opt_data in q_options:
+                opt_text = opt_data.get('text') if isinstance(opt_data, dict) else opt_data
+                db.session.add(Option(text=opt_text, question_id=question.id))
+
+    # Suppression questions non envoyées
+    sent_question_ids = {q.get('id') for q in questions_data if q.get('id')}
+    for q in list(poll.questions):
+        if q.id not in sent_question_ids:
+            db.session.delete(q)
+
+    db.session.commit()
+
+    return jsonify(poll.to_dict()), 200

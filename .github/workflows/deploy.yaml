@@ -1,0 +1,44 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  ##############################################################################
+  #                                CONTEXT                                     #
+  ##############################################################################
+  set-context:
+    runs-on: ubuntu-latest
+    outputs:
+      commit_message: ${{ steps.set_tf_dir.outputs.commit_message }}
+      tf_dir: ${{ steps.set_tf_dir.outputs.tf_dir }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: set_tf_dir
+        run: |
+          commit_msg="$(git log -1 --pretty=%B)"
+          echo "commit_message=$commit_msg"
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Clever Cloud CLI
+        run: |
+          npm install -g clever-tools
+
+      - name: Login & deploy with Clever Tools
+        run: |
+          npx --yes clever-tools@latest login --token "$CLEVER_TOKEN" --secret "$CLEVER_SECRET"
+          npx --yes clever-tools@latest env set FRONTEND_ORIGIN "$FRONTEND_ORIGIN" --alias tf-cleverPoll-backend
+          npx --yes clever-tools@latest deploy --force
+        env:
+          CLEVER_TOKEN: ${{ secrets.TOKEN }}
+          CLEVER_SECRET: ${{ secrets.SECRET }}
+          FRONTEND_ORIGIN: ${{ secrets.FRONTEND_ORIGIN }}
